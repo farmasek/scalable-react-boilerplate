@@ -1,16 +1,22 @@
 import {
   {{ uppercase name }}_DEFAULT_ACTION,
 } from './constants';
+import { Record } from 'immutable'
 
-const initialState = {
+const initialState = new Record(
+  {
   // Initial State goes here!
-};
+  initialStateItem : null
+  }
+);
 
 const {{ camelCase name }}Reducer =
-  (state = initialState, action) => {
+  (state = new initialState(), action) => {
     switch (action.type) {
-      case DEFAULT_ACTION:
-        return state;
+      case {{ uppercase name }}_DEFAULT_ACTION,:  {
+        const actionStateItem = 'actionStateItem'
+        return state.set('initialStateItem',actionStateItem);
+        }
       default:
         return state;
     }
