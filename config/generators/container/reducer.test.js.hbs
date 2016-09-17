@@ -1,14 +1,19 @@
 import expect from 'expect';
+import expectImmutable from 'expect-immutable';
 import {{ camelCase name }}Reducer from '../reducer';
+import { Record } from 'immutable'
 
-const initialState = {
+expect.extend(expectImmutable);
+
+const InitialState = new Record({
   // Initial State goes here!
-};
+    initialStateItem: null,
+});
 
 describe('{{ camelCase name }}Reducer', () => {
   it('returns the initial state', () => {
     expect(
       {{ camelCase name }}Reducer(undefined, {})
-    ).toEqual(initialState);
+    ).toEqualImmutable(new InitialState());
   });
 });
