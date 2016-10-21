@@ -3,11 +3,19 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as actionCreators from './actions';
 import { Navbar } from 'components';
+import styles from './index.module.scss';
+import AppBar from 'react-toolbox/lib/app_bar';
+
 
 const Main = (props) => (
   <div>
-    <Navbar />
-    {React.cloneElement(props.children, props)}
+    <AppBar fixed flat>
+      <a href="/home">React Toolbox Docs</a>
+      <Navbar />
+    </AppBar>
+    <div className={styles.content}>
+      {React.cloneElement(props.children, props)}
+    </div>
   </div>
 );
 

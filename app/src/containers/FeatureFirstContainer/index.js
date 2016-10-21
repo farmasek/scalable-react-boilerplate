@@ -1,10 +1,4 @@
 import React, { PropTypes, Component } from 'react';
-/* eslint-disable import/no-unresolved */
-import {
-  LogoImage,
-  Header,
-} from 'components';
-/* eslint-enable import/no-unresolved */
 import styles from './index.module.scss';
 import cssModules from 'react-css-modules';
 import { connect } from 'react-redux';
@@ -16,15 +10,18 @@ export class FeatureFirstContainer extends Component {
     super(props);
     this.initiateLoading = this.initiateLoading.bind(this);
   }
+
   componentDidMount() {
     this.initiateLoading();
   }
+
   initiateLoading() {
     const {
       actions,
     } = this.props;
     actions.loadDataInitiation();
   }
+
   render() {
     const {
       isLoading,
@@ -33,16 +30,9 @@ export class FeatureFirstContainer extends Component {
       <div className={styles.container}>
         {isLoading ?
           <h1>LOADING...</h1>
-        :
+          :
           <div>
-            <LogoImage
-              imageSource="https://github.com/RyanCCollins/cdn/raw/master/alumni-webapp/udacity-alumni-small.png?raw=true"
-            />
-            <div className={styles.headerText}>
-              <Header
-                content="Scaling the Front End feature first with the Udacity Alumni Dev Team!"
-              />
-            </div>
+            <h1>Hello from FeatureFirstContainer</h1>
           </div>
         }
       </div>

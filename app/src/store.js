@@ -5,8 +5,9 @@ import { browserHistory } from 'react-router';
 import createLogger from 'redux-logger';
 import promiseMiddleware from 'redux-promise-middleware';
 import rootReducer from './reducers';
-const isClient = typeof document !== 'undefined';
-const isDeveloping = process.env.NODE_ENV !== 'production';
+
+import { createEpicMiddleware } from 'redux-observable';
+import rootEpics from '../src/epics';
 
 const initialState = {
   featureComponent: {
@@ -18,27 +19,26 @@ const initialState = {
 
 /* Commonly used middlewares and enhancers */
 /* See: http://redux.js.org/docs/advanced/Middleware.html*/
+const epicMiddleware = createEpicMiddleware(rootEpics);
 const loggerMiddleware = createLogger();
-const middlewares = [thunk, promiseMiddleware()];
-
-if (isDeveloping) {
-  middlewares.push(loggerMiddleware);
-}
+const middlewares = [thunk,
+  promiseMiddleware(),
+  loggerMiddleware,
+  epicMiddleware,
+];
 
 /* Everyone should use redux dev tools */
 /* https://github.com/gaearon/redux-devtools */
 /* https://medium.com/@meagle/understanding-87566abcfb7a */
 const enhancers = [];
 const devToolsExtension = window.devToolsExtension;
-if (isClient && isDeveloping) {
-  if (typeof devToolsExtension === 'function') {
-    enhancers.push(devToolsExtension());
-  }
+if (typeof devToolsExtension === 'function') {
+  enhancers.push(devToolsExtension());
 }
 
 const composedEnhancers = compose(
-  applyMiddleware(...middlewares),
-  ...enhancers
+    applyMiddleware(...middlewares),
+    ...enhancers
 );
 
 /* Hopefully by now you understand what a store is and how redux uses them,
@@ -46,9 +46,9 @@ const composedEnhancers = compose(
  * And https://egghead.io/lessons/javascript-redux-implementing-store-from-scratch
  */
 const store = createStore(
-  rootReducer,
-  initialState,
-  composedEnhancers,
+    rootReducer,
+    initialState,
+    composedEnhancers,
 );
 
 /* See: https://github.com/reactjs/react-router-redux/issues/305 */

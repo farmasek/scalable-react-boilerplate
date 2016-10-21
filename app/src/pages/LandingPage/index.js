@@ -9,7 +9,7 @@ import { FeatureFirstContainer } from 'containers';
 // Pages map directly to Routes, i.e. one page equals on Route
 // Handler that maps to a route in /utils/routes
 const LandingPage = (props) => (
-  <div className={styles.container}>
+  <div>
     <FeatureFirstContainer
       {...props}
     />
