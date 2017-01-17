@@ -1,76 +1,85 @@
-import webpack from 'webpack';
-import path from 'path';
-import HtmlwebpackPlugin from 'html-webpack-plugin';
-import NpmInstallPlugin from 'npm-install-webpack-plugin';
-import Visualizer from 'webpack-visualizer-plugin';
+/* eslint-disable */
+const webpack = require('webpack');
+const path = require('path');
+const HtmlwebpackPlugin = require('html-webpack-plugin');
+const NpmInstallPlugin = require('npm-install-webpack-plugin');
 const autoprefixer = require('autoprefixer');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const precss = require('precss');
+
 const ROOT_PATH = path.resolve(__dirname);
 
-const env = process.env.NODE_ENV || 'development';
-const PORT = process.env.PORT || 1337;
-const HOST = '0.0.0.0'; // Set to localhost if need be.
-
-const pathToTheme = JSON.stringify(path.resolve('styles/_theme.scss')).replace('"', '').replace('"', '').split('\\\\').join('/');
-
 module.exports = {
-  devtool: process.env.NODE_ENV === 'production' ? '' : 'source-map',
+  devtool: 'eval',
   entry: [
-    path.resolve(ROOT_PATH, 'app/src/index')
+    'react-hot-loader/patch',
+    'webpack-dev-server/client?http://localhost:1337',
+    'webpack/hot/only-dev-server',
+    path.resolve(ROOT_PATH, 'app/src/index'),
   ],
+  output: {
+    path: path.resolve(ROOT_PATH, 'app/build'),
+    publicPath: '/',
+    filename: 'bundle.js',
+  },
   module: {
     preLoaders: [
       {
         test: /\.jsx?$/,
-        loaders: process.env.NODE_ENV === 'production' ? [] : ['eslint'],
-        include: path.resolve(ROOT_PATH, './app'),
+        loaders: ['eslint'],
+        include: path.resolve(ROOT_PATH, './app')
       }
     ],
     loaders: [{
       test: /\.jsx?$/,
       exclude: /node_modules/,
-      loaders: ['react-hot', 'babel']
+      loaders: ['babel']
     },
-      {
-        test: /\.svg$/,
-        loader: 'babel!svg-react'
-      },
-      {
-        test: /\.json$/,
-        loader: 'json'
-      }, {
-        test: /(\.scss|\.css)$/,
-        exclude: [/\.module\.scss$/, /flexboxgrid/],
-        loader: ExtractTextPlugin.extract('style', 'css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss!sass')
-      },
-
-      {
-        test: /\.module\.scss$/,
-        loaders: [
-          'style',
-          'css?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]',
-          'resolve-url',
-          'sass'
-        ]
-      },
-      {
-        test: /\.css$/,
-        loader: 'style!css?modules',
-        include: /flexboxgrid/,
-      },
-      {
-        test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
-        loader: "url-loader?mimetype=application/font-woff"
-      },
-      {
-        test: /\.(ttf|eot|svg)(\?v=[0-9].[0-9].[0-9])?$/,
-        loader: "file-loader?name=[name].[ext]"
-      },
-      {
-        test: /\.(jpg|png)$/,
-        loader: 'file?name=[path][name].[hash].[ext]'
-      },
-
+    {
+      test: /\.md$/,
+      loader: "html!markdown"
+    },
+    {
+      test: /\.svg$/,
+      loader: 'babel!svg-react'
+    },
+    {
+      test: /\.json$/,
+      loader: 'json'
+    },
+    {
+      test: /\.inline\.scss$/,
+      loader: 'isomorphic-style-loader!css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!resolve-url-loader!postcss-loader!sass-loader'
+    },
+    {
+      test: /\.module\.scss$/,
+      loader: 'style-loader!css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!resolve-url-loader!postcss-loader!sass-loader'
+    },
+    {
+      test: /\.scss$/,
+      exclude: [/\.inline\.scss$/, /\.module\.scss$/],
+      loader: 'style-loader!css-loader!postcss-loader!sass-loader'
+    },
+    {
+      test: /\.css$/,
+      loader: 'style-loader!css-loader'
+    },
+    {
+      test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
+      loader: 'url-loader?mimetype=application/font-woff'
+    },
+    {
+      test: /\.(ttf|eot|svg)(\?v=[0-9].[0-9].[0-9])?$/,
+      loader: 'file-loader?name=[name].[ext]'
+    },
+    {
+      test: /\.(jpg|png)$/,
+      loader: 'file?name=[path][name].[hash].[ext]'
+    }
+  ]
+  },
+  sassLoader: {
+    includePaths: [
+      './node_modules',
     ]
   },
 
@@ -89,35 +98,26 @@ module.exports = {
     alias: {
       components: path.resolve(ROOT_PATH, 'app/src/components'),
       containers: path.resolve(ROOT_PATH, 'app/src/containers'),
-      taiComponents: path.resolve(ROOT_PATH, 'app/src/tai/components'),
-      taiContainers: path.resolve(ROOT_PATH, 'app/src/tai/containers'),
-      pages: path.resolve(ROOT_PATH, 'app/src/pages')
+      pages: path.resolve(ROOT_PATH, 'app/src/pages'),
+      fragments: path.resolve(ROOT_PATH, 'app/src/fragments'),
+      config: path.resolve(ROOT_PATH, 'app/src/config'),
     },
   },
-  output: {
-    path: process.env.NODE_ENV === 'production' ? path.resolve(ROOT_PATH, 'server/public') : path.resolve(ROOT_PATH, 'app/build'),
-    publicPath: '/',
-    filename: 'bundle.js',
-  },
-  devServer: {
-    contentBase: path.resolve(ROOT_PATH, 'app/build'),
-    historyApiFallback: true,
-    hot: true,
-    inline: true,
-    progress: true,
-    // Constants defined above take care of logic
-    // For setting host and port
-    host: HOST,
-    port: PORT
+  postcss: function () {
+    return {
+      defaults: [precss, autoprefixer],
+      cleaner:  [autoprefixer({ browsers: [] })]
+    };
   },
   plugins: [
-    new ExtractTextPlugin('bundle.css', {allChunks: true}),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new NpmInstallPlugin(),
     new HtmlwebpackPlugin({
       title: 'Scalable React Boilerplate',
-      template: 'index.html'
+      template: 'config/templates/_index.dev.html',
     }),
-    new Visualizer()
-  ]
+  ],
 };

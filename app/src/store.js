@@ -1,44 +1,53 @@
 import { createStore, compose, applyMiddleware } from 'redux';
-import { syncHistoryWithStore } from 'react-router-redux';
+import { syncHistoryWithStore, routerActions, routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk';
 import { browserHistory } from 'react-router';
-import createLogger from 'redux-logger';
-import promiseMiddleware from 'redux-promise-middleware';
+import { UserAuthWrapper as userAuthWrapper } from 'redux-auth-wrapper';
 import rootReducer from './reducers';
+import client from './apolloClient';
+/* GENERATOR: Import all of your initial state */
+import { initialState as landing } from './containers/LandingContainer/reducer';
+import { initialState as app } from './containers/AppContainer/reducer';
 
 import { createEpicMiddleware } from 'redux-observable';
 import rootEpics from '../src/epics';
 
 const initialState = {
-  featureComponent: {
-    isLoading: false,
-    data: {},
-    error: {},
-  },
+  /* GENERATOR: Compile all of your initial state */
+  app,
+  landing,
 };
 
 /* Commonly used middlewares and enhancers */
 /* See: http://redux.js.org/docs/advanced/Middleware.html*/
 const epicMiddleware = createEpicMiddleware(rootEpics);
-const loggerMiddleware = createLogger();
-const middlewares = [thunk,
-  promiseMiddleware(),
-  loggerMiddleware,
-  epicMiddleware,
-];
+
+const routingMiddleware = routerMiddleware(browserHistory);
+const middlewares = [thunk, routingMiddleware, client.middleware()];
+
+const isClient = typeof document !== 'undefined';
+const isDeveloping = process.env.NODE_ENV !== 'production';
+
+if (isDeveloping && isClient) {
+  const createLogger = require('redux-logger'); // eslint-disable-line
+  const loggerMiddleware = createLogger();
+  middlewares.push(loggerMiddleware);
+}
 
 /* Everyone should use redux dev tools */
 /* https://github.com/gaearon/redux-devtools */
 /* https://medium.com/@meagle/understanding-87566abcfb7a */
 const enhancers = [];
-const devToolsExtension = window.devToolsExtension;
-if (typeof devToolsExtension === 'function') {
-  enhancers.push(devToolsExtension());
+if (isClient && isDeveloping) {
+  const devToolsExtension = window.devToolsExtension;
+  if (typeof devToolsExtension === 'function') {
+    enhancers.push(devToolsExtension());
+  }
 }
 
 const composedEnhancers = compose(
-    applyMiddleware(...middlewares),
-    ...enhancers
+  applyMiddleware(...middlewares),
+  ...enhancers,
 );
 
 /* Hopefully by now you understand what a store is and how redux uses them,
@@ -52,7 +61,23 @@ const store = createStore(
 );
 
 /* See: https://github.com/reactjs/react-router-redux/issues/305 */
-export const history = syncHistoryWithStore(browserHistory, store);
+export const history = isClient ?
+  syncHistoryWithStore(browserHistory, store) : undefined;
+
+export const userIsAuthenticated = userAuthWrapper({
+  authSelector: state => state.app.user,
+  redirectAction: routerActions.replace,
+  failureRedirectPath: '/login',
+  wrapperDisplayName: 'userIsAuthenticated',
+});
+
+export const userIsAdmin = userAuthWrapper({
+  authSelector: state => state.app.user,
+  redirectAction: routerActions.replace,
+  failureRedirectPath: '/',
+  wrapperDisplayName: 'userIsAdmin',
+  predicate: user => user.role === 'admin',
+});
 
 /* Hot reloading of reducers.  How futuristic!! */
 if (module.hot) {

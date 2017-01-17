@@ -13,4 +13,8 @@ const Navbar = () => (
   </div>
 );
 
-export default cssModules(Navbar, styles);
+Navbar.propTypes = {
+  pathname: PropTypes.string.isRequired,
+};
+
+export default Navbar;

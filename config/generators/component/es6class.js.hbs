@@ -4,8 +4,11 @@ import React, { PropTypes, Component } from 'react';
 import React, { Component } from 'react';
 {{/if}}
 {{#if wantSCSSModules}}
-import styles from './index.module.scss';
 import cssModules from 'react-css-modules';
+import styles from './index.module.scss';
+{{/if}}
+{{#if wantStyledComponents}}
+import { StyledWrapper } from './styles';
 {{/if}}
 
 class {{ properCase name }} extends Component { // eslint-disable-line react/prefer-stateless-function
