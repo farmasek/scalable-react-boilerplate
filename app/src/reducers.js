@@ -1,19 +1,15 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
-import { reducer as formReducer } from 'redux-form';
-import client from './apolloClient';
 
 /* GENERATOR: Import all of your reducers */
-import landing from './containers/LandingContainer/reducer';
+import githubReducer from './containers/EpicContainer/reducer';
 import app from './containers/AppContainer/reducer';
 
 const rootReducer = combineReducers({
   app,
   /* GENERATOR: Compile all of your reducers */
-  landing,
+  githubReducer,
   routing: routerReducer,
-  form: formReducer,
-  apollo: client.reducer(),
 });
 
 export default rootReducer;

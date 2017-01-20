@@ -1,21 +1,18 @@
 import { createStore, compose, applyMiddleware } from 'redux';
 import { syncHistoryWithStore, routerActions, routerMiddleware } from 'react-router-redux';
-import thunk from 'redux-thunk';
 import { browserHistory } from 'react-router';
-import { UserAuthWrapper as userAuthWrapper } from 'redux-auth-wrapper';
-import rootReducer from './reducers';
-import client from './apolloClient';
-/* GENERATOR: Import all of your initial state */
-import { initialState as landing } from './containers/LandingContainer/reducer';
-import { initialState as app } from './containers/AppContainer/reducer';
-
 import { createEpicMiddleware } from 'redux-observable';
 import rootEpics from '../src/epics';
 
+import rootReducer from './reducers';
+/* GENERATOR: Import all of your initial state */
+import { initialState as githubReducer } from './containers/EpicContainer/reducer';
+import { initialState as app } from './containers/AppContainer/reducer';
+
 const initialState = {
   /* GENERATOR: Compile all of your initial state */
+  githubReducer,
   app,
-  landing,
 };
 
 /* Commonly used middlewares and enhancers */
@@ -23,7 +20,7 @@ const initialState = {
 const epicMiddleware = createEpicMiddleware(rootEpics);
 
 const routingMiddleware = routerMiddleware(browserHistory);
-const middlewares = [thunk, routingMiddleware, client.middleware()];
+const middlewares = [ routingMiddleware, epicMiddleware];
 
 const isClient = typeof document !== 'undefined';
 const isDeveloping = process.env.NODE_ENV !== 'production';
@@ -55,29 +52,15 @@ const composedEnhancers = compose(
  * And https://egghead.io/lessons/javascript-redux-implementing-store-from-scratch
  */
 const store = createStore(
-    rootReducer,
-    initialState,
-    composedEnhancers,
+  rootReducer,
+  initialState,
+  composedEnhancers,
 );
 
 /* See: https://github.com/reactjs/react-router-redux/issues/305 */
 export const history = isClient ?
   syncHistoryWithStore(browserHistory, store) : undefined;
 
-export const userIsAuthenticated = userAuthWrapper({
-  authSelector: state => state.app.user,
-  redirectAction: routerActions.replace,
-  failureRedirectPath: '/login',
-  wrapperDisplayName: 'userIsAuthenticated',
-});
-
-export const userIsAdmin = userAuthWrapper({
-  authSelector: state => state.app.user,
-  redirectAction: routerActions.replace,
-  failureRedirectPath: '/',
-  wrapperDisplayName: 'userIsAdmin',
-  predicate: user => user.role === 'admin',
-});
 
 /* Hot reloading of reducers.  How futuristic!! */
 if (module.hot) {

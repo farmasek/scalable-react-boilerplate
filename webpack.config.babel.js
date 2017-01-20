@@ -5,6 +5,7 @@ const HtmlwebpackPlugin = require('html-webpack-plugin');
 const NpmInstallPlugin = require('npm-install-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const precss = require('precss');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 
@@ -22,79 +23,58 @@ module.exports = {
     filename: 'bundle.js',
   },
   module: {
-    preLoaders: [
+    loaders: [
       {
         test: /\.jsx?$/,
-        loaders: ['eslint'],
-        include: path.resolve(ROOT_PATH, './app')
+        loaders: [],
+        include: path.resolve(ROOT_PATH, './app'),
+        enforce: 'pre'
+      }, {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loaders: ['babel-loader']
+      },
+      {
+        test: /\.md$/,
+        loader: "html!markdown"
+      },
+      {
+        test: /\.json$/,
+        loader: 'json'
+      },
+      {
+        test: /\.module\.scss$/,
+        loader: 'style-loader!css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!resolve-url-loader!postcss-loader!sass-loader'
+      },
+      {
+        test: /(\.scss|\.css)$/,
+        exclude: [/\.inline\.scss$/, /\.module\.scss$/],
+
+        loader: ExtractTextPlugin.extract({
+          fallbackLoader: 'style-loader',
+          loader: [
+            'css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+            'sass-loader'
+          ]
+        })
+      },
+      {
+        test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
+        loader: 'url-loader?mimetype=application/font-woff'
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9].[0-9].[0-9])?$/,
+        loader: 'file-loader?name=[name].[ext]'
+      },
+      {
+        test: /\.(jpg|png)$/,
+        loader: 'file?name=[path][name].[hash].[ext]'
       }
-    ],
-    loaders: [{
-      test: /\.jsx?$/,
-      exclude: /node_modules/,
-      loaders: ['babel']
-    },
-    {
-      test: /\.md$/,
-      loader: "html!markdown"
-    },
-    {
-      test: /\.svg$/,
-      loader: 'babel!svg-react'
-    },
-    {
-      test: /\.json$/,
-      loader: 'json'
-    },
-    {
-      test: /\.inline\.scss$/,
-      loader: 'isomorphic-style-loader!css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!resolve-url-loader!postcss-loader!sass-loader'
-    },
-    {
-      test: /\.module\.scss$/,
-      loader: 'style-loader!css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!resolve-url-loader!postcss-loader!sass-loader'
-    },
-    {
-      test: /\.scss$/,
-      exclude: [/\.inline\.scss$/, /\.module\.scss$/],
-      loader: 'style-loader!css-loader!postcss-loader!sass-loader'
-    },
-    {
-      test: /\.css$/,
-      loader: 'style-loader!css-loader'
-    },
-    {
-      test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
-      loader: 'url-loader?mimetype=application/font-woff'
-    },
-    {
-      test: /\.(ttf|eot|svg)(\?v=[0-9].[0-9].[0-9])?$/,
-      loader: 'file-loader?name=[name].[ext]'
-    },
-    {
-      test: /\.(jpg|png)$/,
-      loader: 'file?name=[path][name].[hash].[ext]'
-    }
-  ]
-  },
-  sassLoader: {
-    includePaths: [
-      './node_modules',
     ]
   },
 
-  postcss: [autoprefixer],
-  sassLoader: {
-    data: '@import "app/styles/_config.scss";',
-    includePaths: [path.resolve(ROOT_PATH, 'app/src/')]
-  },
-
   resolve: {
-    extensions: ['', '.scss', '.css', '.js', '.json'],
-    modulesDirectories: [
-      'node_modules',
-      path.resolve(ROOT_PATH, './node_modules')
-    ],
+    extensions: ['.js', '.jsx', '.json'],
     alias: {
       components: path.resolve(ROOT_PATH, 'app/src/components'),
       containers: path.resolve(ROOT_PATH, 'app/src/containers'),
@@ -103,21 +83,39 @@ module.exports = {
       config: path.resolve(ROOT_PATH, 'app/src/config'),
     },
   },
-  postcss: function () {
-    return {
-      defaults: [precss, autoprefixer],
-      cleaner:  [autoprefixer({ browsers: [] })]
-    };
-  },
+
   plugins: [
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        context: ROOT_PATH,
+        output: {
+          path: ROOT_PATH
+        },
+        postcss () {
+          return {
+            defaults: [precss, autoprefixer],
+            cleaner: [autoprefixer({ browsers: [] })]
+          };
+        },
+        sassLoader: {
+          data: '@import "app/styles/_config.scss";',
+          includePaths: [
+            './node_modules',
+          ]
+        },
+      }
+    }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new NpmInstallPlugin(),
     new HtmlwebpackPlugin({
-      title: 'Scalable React Boilerplate',
+      title: 'Scalable boilerplate',
       template: 'config/templates/_index.dev.html',
     }),
+    new ExtractTextPlugin({
+      filename: '[name].[id].style.css',
+      allChunks: false
+    })
   ],
 };

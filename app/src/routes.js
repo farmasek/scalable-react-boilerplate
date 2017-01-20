@@ -1,9 +1,9 @@
 /* global System b:true */
 import React from 'react';
+import { Provider } from 'react-redux';
+
 import { Router } from 'react-router';
-import { ApolloProvider } from 'react-apollo';
 import store, { history } from './store';
-import client from './apolloClient';
 import { AppContainer } from 'containers'; // eslint-disable-line
 
 /* eslint-disable */
@@ -26,6 +26,8 @@ const loadRoute = cb =>
   module =>
     cb(null, module.default);
 
+// TODO impement routes security examples
+
 export const routes = {
   component: AppContainer,
   path: '/',
@@ -38,18 +40,9 @@ export const routes = {
   },
   childRoutes: [
     {
-      path: '/about',
-      getComponent(location, callback) {
-        System.import('./pages/AboutPage') // eslint-disable-line block-scoped-var
-          .then(loadRoute(callback))
-          .catch(err => errorLoading(err));
-      },
-    },
-/* GENERATOR: Newly generated Routes go here */
-    {
       path: '*',
       getComponent(location, callback) {
-        System.import('./pages/NotFoundPage') // eslint-disable-line block-scoped-var
+        System.import('./pages/LandingPage') // eslint-disable-line block-scoped-var
           .then(loadRoute(callback))
           .catch(err => errorLoading(err));
       },
@@ -57,13 +50,13 @@ export const routes = {
   ],
 };
 
-const RouterApp = props => (
-  <ApolloProvider {...props} store={store} client={client}>
+const RouterApp = () => (
+  <Provider store={store}>
     <Router
       history={history}
       routes={routes}
     />
-  </ApolloProvider>
+  </Provider>
 );
 
 export default RouterApp;

@@ -1,1 +1,28 @@
 @import "~react-toolbox/lib/colors";
+
+//$color-primary: $palette-blue-500;
+//$color-primary-dark: $palette-blue-700;
+$color-primary:  $palette-red-700 !default;
+$color-primary-dark:   $palette-red-900 !default;
+$color-accent:   $palette-yellow-500 !default;
+$color-accent-dark:   black !default;
+$color-primary-contrast:   white !default;
+$color-accent-contrast:   white !default;
+$color-background-color:   #EEEEEE !default;
+
+$color-divider-color: rgba(0, 0, 0, 0.12) !default;
+$color-text-grey-color: rgba(0, 0, 0, 0.54) !default;
+$color-text-header-color: rgba(0, 0, 0, 0.82) !default;
+
+// Work schedule colors
+$color-work-schedule-not-working: $palette-grey-700 !default;
+$color-work-schedule-home-office: $palette-deep-purple-700 !default;
+$color-work-schedule-at-work:  $palette-green-700 !default;
+$color-work-schedule-hour-schedule: #689F38;
+
+
+
+$unit : 0.7rem !default;
+
+$unitSectionWidth: 20em;
+$mobileWidth: 500px;

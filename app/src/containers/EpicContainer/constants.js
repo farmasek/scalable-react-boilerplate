@@ -1,0 +1,2 @@
+export const FETCH_GITHUB_USER = 'FETCH_GITHUB_USER';
+export const CLEAN_USER_INFO = 'CLEAN_USER_INFO';

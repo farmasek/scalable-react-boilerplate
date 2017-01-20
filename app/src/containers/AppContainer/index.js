@@ -1,23 +1,18 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import App from 'grommet-udacity/components/App';
 import { AppContainer as ReactHotLoader } from 'react-hot-loader';
-import { Navbar, AppFooter } from 'components';
 import * as AppContainerActionCreators from './actions';
+
+// TODO  fix hot reloading console error..
 
 class AppContainer extends Component { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const {
-      location,
-    } = this.props;
     return (
       <ReactHotLoader>
-        <App centered={false} inline>
-          <Navbar pathname={location.pathname} />
+        <div>
           {React.cloneElement(this.props.children, this.props)}
-          <AppFooter />
-        </App>
+        </div>
       </ReactHotLoader>
     );
   }

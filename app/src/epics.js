@@ -1,6 +1,3 @@
-/**
- * Created by Farmas on 21.10.2016.
- */
 import { combineEpics } from 'redux-observable';
-
-export default combineEpics();
+import { epicFetchGithubUser } from './containers/EpicContainer/actions';
+export default combineEpics(epicFetchGithubUser);

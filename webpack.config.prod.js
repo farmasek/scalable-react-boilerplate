@@ -1,6 +1,8 @@
 /* eslint-disable */
 const webpack = require('webpack');
 const path = require('path');
+const HtmlwebpackPlugin = require('html-webpack-plugin');
+
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
 const autoprefixer = require('autoprefixer');
@@ -20,38 +22,20 @@ module.exports = {
     vendor: [
       'react',
       'react-dom',
-      'grommet-udacity',
     ],
   },
   module: {
-    preLoaders: [
+    loaders: [
       {
         test: /\.jsx?$/,
         loaders: [],
         include: path.resolve(ROOT_PATH, './app'),
+        enforce: 'pre'
       },
-    ],
-    loaders: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loaders: ['babel'],
-      },
-      {
-        test: /\.md$/,
-        loader: "html!markdown"
-      },
-      {
-        test: /\.svg$/,
-        loader: 'babel!svg-react'
-      },
-      {
-        test: /\.json$/,
-        loader: 'json'
-      },
-      {
-        test: /\.inline\.scss$/,
-        loader: 'isomorphic-style-loader!css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!resolve-url-loader!postcss-loader!sass-loader'
+        loaders: ['babel-loader'],
       },
       {
         test: /\.module\.scss$/,
@@ -61,16 +45,16 @@ module.exports = {
         }),
       },
       {
-        test: /\.scss$/,
+        test: /(\.scss|\.css)$/,
         exclude: [/\.inline\.scss$/, /\.module\.scss$/],
+
         loader: ExtractTextPlugin.extract({
-            fallbackLoader: 'style-loader',
-            loader: '!css-loader!postcss-loader!sass-loader'
-          }),
-      },
-      {
-        test: /\.css$/,
-        loader: "style-loader!css-loader"
+          fallbackLoader: 'style-loader',
+          loader: [
+            'css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
+            'sass-loader'
+          ]
+        })
       },
       {
         test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
@@ -86,19 +70,9 @@ module.exports = {
       }
     ]
   },
-  sassLoader: {
-    includePaths: [
-      './node_modules',
-    ]
-  },
-  postcss: function () {
-    return {
-      defaults: [precss, autoprefixer],
-      cleaner:  [autoprefixer({ browsers: [] })]
-    };
-  },
+
   resolve: {
-    extensions: ['', '.js', '.jsx', '.json'],
+    extensions: ['.js', '.jsx', '.json'],
     alias: {
       components: path.resolve(ROOT_PATH, 'app/src/components'),
       containers: path.resolve(ROOT_PATH, 'app/src/containers'),
@@ -117,6 +91,26 @@ module.exports = {
     chunks: true,
   },
   plugins: [
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        context: ROOT_PATH,
+        output: {
+          path: ROOT_PATH
+        },
+        postcss () {
+          return {
+            defaults: [precss, autoprefixer],
+            cleaner: [autoprefixer({ browsers: [] })]
+          };
+        },
+        sassLoader: {
+          data: '@import "app/styles/_config.scss";',
+          includePaths: [
+            './node_modules',
+          ]
+        },
+      }
+    }),
     new ManifestPlugin({
       fileName: 'manifest.json',
       basePath: '/'
@@ -145,8 +139,11 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
     }),
+    new HtmlwebpackPlugin({
+      title: 'Scalable boilerplate',
+      template: 'config/templates/_index.dev.html',
+    }),
     new webpack.optimize.OccurrenceOrderPlugin(true),
-    new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: false
     }),

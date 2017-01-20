@@ -1,44 +1,5 @@
-// Included if you are using grommet.  Otherwise, just erase this next line.
-
-// Add globally used utility styles here.
-// Or import scss libraries that are to be used without CSS modules.
-/*
-.my-style {
-  max-width: 20px;
-  color: goldenrod;
-}
-<div className="my-style" />
-*/
-
-html {
-  overflow-x: hidden;
-}
-
-.full-height {
-  min-height: 100vh;
-}
-
-.img-responsive {
-  max-width: 100%;
-  height: auto;
-}
-
-a.active {
-  color: #2e3d49 !important;
-  border-bottom: 2px solid #7d97ad;
-}
-
-.panel {
-  background: #FFF;
-  margin-bottom: 14px;
-  background: #fff;
-  box-shadow: 0 2px 4px 0 rgba(46, 61, 73, 0.2);
-  border: 1px solid #dbe2e8;
-  max-width: 960px;
-}
-
-.grommetux-hero__background {
-  height: 720px !important;
-  color: white !important;
-  width: 100%;
-}
+@import "_config.scss";
+@import '~react-toolbox/lib/colors';
+@import "~react-toolbox/lib/globals";
+@import "~react-toolbox/lib/mixins";
+@import "~react-toolbox/lib/input/config";
