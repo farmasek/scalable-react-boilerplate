@@ -10,6 +10,7 @@ Also very lightweited with very basic example.
 ##Big thanks to original author !
  
 ###TODO
-[ ] - Modify generators to for this fork
-[ ] - fix hot reloading - its working, but not very well...
-[ ] - implement auth example
+
+* [ ] - Modify generators to for this fork
+* [ ] - fix hot reloading - its working, but not very well...
+* [ ] - implement auth example
