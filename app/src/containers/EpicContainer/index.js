@@ -4,27 +4,34 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as EpicActionCreators from './actions';
 import styles from './index.module.scss';
-import { Button } from 'react-toolbox/lib/button';
-import { Input } from 'react-toolbox/lib/input';
+
+import TextField from 'react-md/lib/TextFields';
+// import Button from 'react-md/lib/Buttons/Button';
+
 import { AppFooter } from 'components';
+import { Card, CardTitle, CardText, CardActions } from 'react-md/lib/Cards';
+import Button from 'react-md/lib/Buttons';
+
 
 class EpicContainer extends Component { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
       <div className={styles.epic}>
-        Write github user:
-        <Input
+
+        This is basic example of rxjs epics.
+
+        <TextField
+         label="Find github user"
+         className="md-cell md-cell--bottom"
           onChange={(text) => this.props.actions.fetchUserInfo(text)}
         />
         <pre>
           {this.props.userInfo}
         </pre>
-        <Button
-          icon='remove'
-          label='Clean text'
-          flat primary
-          onClick={() => this.props.actions.clearUserInfo()}
-        />
+         <Button raised primary label="Clear"
+         onClick={() => this.props.actions.clearUserInfo()}>
+         home
+         </Button>
         <AppFooter/>
       </div>
     );

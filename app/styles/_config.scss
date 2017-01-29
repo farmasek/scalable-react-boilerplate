@@ -1,5 +1,11 @@
 @import "~react-toolbox/lib/colors";
 
+@import '~normalize.css';
+@import '~react-md/src/scss/react-md';
+
+// Include all components
+@include react-md-everything;
+
 //$color-primary: $palette-blue-500;
 //$color-primary-dark: $palette-blue-700;
 $color-primary:  $palette-red-700 !default;

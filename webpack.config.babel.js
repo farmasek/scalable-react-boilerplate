@@ -23,10 +23,11 @@ module.exports = {
     filename: 'bundle.js',
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
-        loaders: [],
+        exclude: /node_modules/,
+        loaders: ['eslint-loader'],
         include: path.resolve(ROOT_PATH, './app'),
         enforce: 'pre'
       }, {
@@ -44,19 +45,15 @@ module.exports = {
       },
       {
         test: /\.module\.scss$/,
-        loader: 'style-loader!css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!resolve-url-loader!postcss-loader!sass-loader'
-      },
-      {
-        test: /(\.scss|\.css)$/,
-        exclude: [/\.inline\.scss$/, /\.module\.scss$/],
-
         loader: ExtractTextPlugin.extract({
           fallbackLoader: 'style-loader',
-          loader: [
-            'css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
-            'sass-loader'
-          ]
-        })
+          loader: 'css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!resolve-url-loader!postcss-loader!sass-loader'
+        }),
+      },
+      {
+        test: /\.s(a|c)ss$/,
+        exclude: /\.module\.scss$/,
+        loader: 'style-loader!css-loader?importLoaders=2!postcss-loader!sass-loader?sourceMap&outputStyle=expanded'
       },
       {
         test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
@@ -97,12 +94,12 @@ module.exports = {
             cleaner: [autoprefixer({ browsers: [] })]
           };
         },
-        sassLoader: {
-          data: '@import "app/styles/_config.scss";',
-          includePaths: [
-            './node_modules',
-          ]
-        },
+        // sassLoader: {
+        //   data: '@import "app/styles/_config.scss";',
+        //   includePaths: [
+        //     './node_modules',
+        //   ]
+        // },
       }
     }),
     new webpack.DefinePlugin({
